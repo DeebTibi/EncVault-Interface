@@ -54,6 +54,7 @@ async function Register(user_name, password, userKey) {
   return new Promise((resolve, reject) =>
     stub.Register({ user_name, password, userKey }, function (err, response) {
       if (err) {
+        console.log(err);
         return resolve({ success: false });
       }
       resolve({ success: true, token: response.token });
