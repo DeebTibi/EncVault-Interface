@@ -2,18 +2,36 @@
 import React, { useState } from "react";
 import { useFormState } from "react-dom";
 import styles from "./page.module.css";
-import { Button, Input } from "@chakra-ui/react";
+import { Button, Input, useToast } from "@chakra-ui/react";
 import { submitLogin, submitSignup } from "@/scripts/server_actions";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [userKey, setUserKey] = useState("");
+  const router = useRouter();
+  const toast = useToast();
+
+  async function showToast(title, message, isSuccess) {
+    toast({
+      title,
+      description: message,
+      status: isSuccess ? "success" : "error",
+      duration: 5000,
+      isClosable: true,
+    });
+  }
 
   async function handleSignup() {
     const token = await submitSignup(userName, password, userKey);
+    if (!token) {
+      showToast("Signup Failed", "User already exists", false);
+      return;
+    }
     localStorage.setItem("token", token);
     localStorage.setItem("userName", userName);
+    router.replace("/dashboard");
   }
 
   return (

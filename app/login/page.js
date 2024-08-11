@@ -5,11 +5,13 @@ import styles from "./page.module.css";
 import { Button, Input } from "@chakra-ui/react";
 import { submitLogin, verifyToken } from "@/scripts/server_actions";
 import { useRouter } from "next/navigation";
+import { useToast } from "@chakra-ui/react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const toast = useToast();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -25,9 +27,23 @@ export default function LoginPage() {
 
   async function handleLogin() {
     const token = await submitLogin(userName, password);
+    if (!token) {
+      showToast("Login Failed", "Invalid username or password", false);
+      return;
+    }
     localStorage.setItem("token", token);
     localStorage.setItem("userName", userName);
     router.replace("/dashboard");
+  }
+
+  async function showToast(title, message, isSuccess) {
+    toast({
+      title,
+      description: message,
+      status: isSuccess ? "success" : "error",
+      duration: 5000,
+      isClosable: true,
+    });
   }
 
   return (
